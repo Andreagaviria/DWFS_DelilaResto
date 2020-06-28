@@ -1,0 +1,21 @@
+{
+  "name": "proyecto_delila_resto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.4",
+    "sequelize": "^5.21.13",
+    "validator": "^13.1.1"
+  }
+}
