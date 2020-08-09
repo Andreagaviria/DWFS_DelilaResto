@@ -1,0 +1,84 @@
+DROP DATABASE IF EXISTS Delila;
+CREATE DATABASE IF NOT EXISTS Delila; 
+USE Delila;
+CREATE TABLE products 
+(
+ 	product_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL,
+    price INT NOT NULL,
+    photo VARCHAR(100)
+);
+
+
+CREATE TABLE users
+(
+ 	user_id INT PRIMARY KEY AUTO_INCREMENT,
+    firstName VARCHAR(60) NOT NULL,
+    lastName VARCHAR(60) NOT NULL,
+    user VARCHAR(60) NOT NULL,
+    email VARCHAR(60) NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    phone VARCHAR(60) NOT NULL,
+    password VARCHAR(150) NOT NULL
+);
+
+
+CREATE TABLE payments
+(
+ 	payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL
+);
+
+
+CREATE TABLE status
+(
+ 	status_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL
+);
+
+
+CREATE TABLE orders
+(
+ 	order_id INT PRIMARY KEY AUTO_INCREMENT,
+    payment_id INT NOT NULL,
+    FOREIGN KEY fk_orders_payments(payment_id)
+    	REFERENCES payments (payment_id)
+    	ON UPDATE CASCADE,
+    status_id INT NOT NULL,
+    FOREIGN KEY fk_orders_status(status_id)
+    	REFERENCES status (status_id)
+    	ON UPDATE CASCADE,
+    user_id INT REFERENCES users(user_id),
+    total INT NOT NULL
+);
+
+
+CREATE TABLE productOrderRelation(
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    order_id INT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+		ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+		ON DELETE CASCADE
+);
+
+INSERT INTO products (name, price, photo) VALUES ('pizza', 25000, 'www.google.com');
+INSERT INTO products (name, price, photo) VALUES ('hotdog', 18000, 'www.google.com');
+INSERT INTO products (name, price, photo) VALUES ('pasta', 27000, 'www.google.com');
+INSERT INTO payments (name) VALUES ('Efectivo');
+INSERT INTO payments (name) VALUES ('Tarjeta de crédito');
+INSERT INTO payments (name) VALUES ('PSE');
+INSERT INTO status (name) VALUES ('Confirmado');
+INSERT INTO status (name) VALUES ('En preparación');
+INSERT INTO status (name) VALUES ('En camino');
+INSERT INTO status (name) VALUES ('Entregado');
+INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos', 'López', 'carloslopez', 'carlos.lopez@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
+INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos1', 'López1', 'carloslopez1', 'carlos.lopez1@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
+INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos2', 'López2', 'carloslopez2', 'carlos.lopez2@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
+INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (1, 2, 3, 56000);
+INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (1, 3, 2, 40000);
+INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (3, 1, 1, 7000);
+INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (1, 4, 1, 12000);
+INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (3, 1, 2, 45700);
+INSERT INTO productOrderRelation (product_id, order_id) VALUES (1, 1);

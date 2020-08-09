@@ -4,15 +4,6 @@ module.exports = router;
 
 const database = require("../db");
 
-// const validarCamposNoVaciosPedidos = (req, res, next) => {
-//   if (!req.body.status_id || !req.body.payment_id || !req.body.user_id) {
-//     console.log("hola middleware");
-//     return res.status(404).json({ Error: "hay un campo vacio" });
-//   } else {
-//     next();
-//   }
-// };
-
 router.get("/", (req, res) => {
   try {
     database.authenticate().then(async () => {
@@ -25,28 +16,30 @@ router.get("/", (req, res) => {
       JOIN users AS u
       ON o.user_id=u.user_id
       `;
-      database.query(query, { type: database.QueryTypes.SELECT }).then(async (resultados) => {
-        //console.log(resultados);
-
-        resultados.forEach((element, index) => {
-          const query = `SELECT product_id FROM productorderrelation WHERE order_id = ${element.order_id}`;
-          database.query(query, { type: database.QueryTypes.SELECT }).then((productos) => {
-            element.productList = productos;
-            productos.forEach((product, index) => {
-              const query = `SELECT * FROM products WHERE product_id = ${product.product_id}`;
-              database.query(query, { type: database.QueryTypes.SELECT }).then(async (productDetail) => {
-                //console.log(resultados);
-                console.log(productDetail);
-                product.details = await productDetail;
+      database
+        .query(query, { type: database.QueryTypes.SELECT })
+        .then(async (resultados) => {
+          resultados.forEach((element, index) => {
+            const query = `SELECT product_id FROM productOrderRelation WHERE order_id = ${element.order_id}`;
+            database
+              .query(query, { type: database.QueryTypes.SELECT })
+              .then((productos) => {
+                element.productList = productos;
+                productos.forEach((product, index) => {
+                  const query = `SELECT * FROM products WHERE product_id = ${product.product_id}`;
+                  database
+                    .query(query, { type: database.QueryTypes.SELECT })
+                    .then(async (productDetail) => {
+                      console.log(productDetail);
+                      product.details = await productDetail;
+                    });
+                });
               });
-            });
-            // res.json(resultados);
           });
+          setTimeout(() => {
+            res.json(resultados);
+          }, 1000);
         });
-        setTimeout(() => {
-          res.json(resultados);
-        }, 1000);
-      });
     });
   } catch (e) {
     res.status(404).json(`Hubo un error Obteniendo los pedidos. ${e.message}`);
@@ -57,20 +50,23 @@ router.put("/:id/status", (req, res) => {
   let log = "";
   database.authenticate().then(async () => {
     const query = `SELECT * FROM orders WHERE order_id=${req.params.id}`;
-    database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      console.log(resultados);
-      //   res.json(resultados);
-      if (resultados.length === 0) {
-        return res.status(404).json({ message: "El pedido no existe" });
-      }
-    });
+    database
+      .query(query, { type: database.QueryTypes.SELECT })
+      .then((resultados) => {
+        console.log(resultados);
+        if (resultados.length === 0) {
+          return res.status(404).json({ message: "El pedido no existe" });
+        }
+      });
 
     if (req.body.status_id) {
       try {
         const query = `UPDATE orders SET status_id = '${req.body.status_id}' WHERE order_id=?`;
-        const resultados = await database.query(query, { replacements: [req.params.id] }).then(() => {
-          log += `se actualizo el status ${req.body.status_id} del pedido con id ${req.params.id},`;
-        });
+        const resultados = await database
+          .query(query, { replacements: [req.params.id] })
+          .then(() => {
+            log += `se actualizo el status ${req.body.status_id} del pedido con id ${req.params.id},`;
+          });
       } catch (error) {
         log += `el status con id: ${req.body.status_id} no existe`;
       }
@@ -79,7 +75,9 @@ router.put("/:id/status", (req, res) => {
     if (log) {
       res.json({ success: `${log}` });
     } else {
-      res.json({ Error: "No se actualizo el status. El status id es obligatorio." });
+      res.json({
+        Error: "No se actualizo el status. El status id es obligatorio.",
+      });
     }
   });
 });
@@ -88,20 +86,22 @@ router.delete("/:id", (req, res) => {
   try {
     database.authenticate().then(async () => {
       const query = `SELECT * FROM orders WHERE order_id=${req.params.id}`;
-      database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-        //console.log(resultados);
-        if (resultados.length === 0) {
-          res.status(404).json({ message: "El pedido no existe" });
-        } else {
-          const query1 = `DELETE FROM productorderrelation WHERE order_id=${req.params.id}`;
-          database.query(query1).then(() => {
-            const query = `DELETE FROM orders WHERE order_id=${req.params.id}`;
-            database.query(query).then(() => {
-              res.json(`El pedido con id ${req.params.id} fue eliminado`);
+      database
+        .query(query, { type: database.QueryTypes.SELECT })
+        .then((resultados) => {
+          //console.log(resultados);
+          if (resultados.length === 0) {
+            res.status(404).json({ message: "El pedido no existe" });
+          } else {
+            const query1 = `DELETE FROM productorderrelation WHERE order_id=${req.params.id}`;
+            database.query(query1).then(() => {
+              const query = `DELETE FROM orders WHERE order_id=${req.params.id}`;
+              database.query(query).then(() => {
+                res.json(`El pedido con id ${req.params.id} fue eliminado`);
+              });
             });
-          });
-        }
-      });
+          }
+        });
     });
   } catch (e) {
     res.status(404).json(`Hubo un error eliminando el pedido ${e.message}`);
@@ -110,75 +110,82 @@ router.delete("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
   database.authenticate().then(async () => {
+    let log = "";
     let query = `SELECT * FROM status WHERE status_id=${req.body.status_id}`;
-    database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      //console.log(resultados);
-      if (resultados.length === 0) {
-        return res.status(404).json({ message: "El status_id no existe" });
-      }
-    });
+    database
+      .query(query, { type: database.QueryTypes.SELECT })
+      .then((resultados) => {
+        if (resultados.length === 0) {
+          return res.status(404).json({ message: "El status_id no existe" });
+        }
+      });
 
     query = `SELECT * FROM payments WHERE payment_id=${req.body.payment_id}`;
-    database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      //console.log(resultados);
-      if (resultados.length === 0) {
-        return res.status(404).json({ message: "El payment_id no existe" });
-      }
-    });
+    database
+      .query(query, { type: database.QueryTypes.SELECT })
+      .then((resultados) => {
+        if (resultados.length === 0) {
+          return res.status(404).json({ message: "El payment_id no existe" });
+        }
+      });
 
     query = `SELECT * FROM users WHERE user_id=${req.body.user_id}`;
-    database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      //console.log(resultados);
-      if (resultados.length === 0) {
-        return res.status(404).json({ message: "El user_id no existe" });
-      }
-    });
-    let log = "";
-    // console.log(req.body.productos);
+    database
+      .query(query, { type: database.QueryTypes.SELECT })
+      .then((resultados) => {
+        if (resultados.length === 0) {
+          return res.status(404).json({ message: "El user_id no existe" });
+        }
+      });
+
     let productos = [];
     query = `INSERT INTO orders (payment_id, status_id, user_id, total) VALUES (?,?,?,?)`;
     const resultados = await database
-      .query(query, { replacements: [req.body.status_id, req.body.payment_id, req.body.user_id, 3000] })
-      .then((resultados) => {
+      .query(query, {
+        replacements: [
+          req.body.status_id,
+          req.body.payment_id,
+          req.body.user_id,
+          0,
+        ],
+      })
+      .then(async (resultados) => {
+        log += `Se creo orden con id ${resultados[0]},`;
+        let sumaPrecios = 0;
         req.body.productos.forEach((elementId) => {
-          console.log(elementId);
           ///////////////////////////////////////////////////////////////
           query = `SELECT * FROM products WHERE product_id=${elementId}`;
           let response;
-          database.query(query, { type: database.QueryTypes.SELECT }).then(async (producto) => {
-            //console.log(resultados);
-            if (producto.length === 0) {
-              console.log(`el producto con id ${elementId} no existe,`);
-            } else {
-              console.log(`el producto con id ${elementId} se agrego al pedido,`);
-              //INSERT INTO productorderrelation (product_id, order_id) VALUES (6, 4);
-              query = `INSERT INTO productorderrelation (product_id, order_id) VALUES (?,?)`;
-              productos.push(elementId);
-              // console.log("holaaaaaa" + resultados[0]);
-              // setTimeout(()=>{
-
-              // },2000);
-              // response = await database.query(query, { replacements: [resultados[0], elementId] });
-            }
-          });
-          ///////////////////////////////////////////////////////////////
+          database
+            .query(query, { type: database.QueryTypes.SELECT })
+            .then(async (producto) => {
+              if (producto.length === 0) {
+                log += `el producto con id ${elementId} no existe,`;
+              } else {
+                log += `el producto con id ${elementId} se agrego al pedido,`;
+                query = `INSERT INTO productOrderRelation (product_id, order_id) VALUES (?,?)`;
+                productos.push(elementId);
+                response = await database.query(query, {
+                  replacements: [elementId, resultados[0]],
+                });
+                sumaPrecios += Number(producto[0].price);
+              }
+            });
+          //////////////////////////////////////////////////////////////////////////
         });
-        // productos.forEach((producto)=>{
 
-        // });
-        resultados.productos = productos;
-        let peticion = `INSERT INTO productorderrelation (product_id, order_id) VALUES (?,?)`;
-        let indexProducto = Number(resultados[0]) - 1;
         setTimeout(async () => {
-          response = await database.query(peticion, { replacements: [20, productos[0]] });
-        }, 1000);
-
-        console.log("esto es", resultados[0]);
-
-        setTimeout(() => {
-          // res.send(`pedido creado con id ${resultados[0]}`);
-          res.json(resultados);
+          query = `UPDATE orders SET total = '${sumaPrecios}' WHERE order_id=?`;
+          resultados = await database.query(query, {
+            replacements: [resultados[0]],
+          });
         }, 3000);
+
+        //////////////////////////////////////////////////////////////////////////
+        setTimeout(() => {
+          console.log(resultados[0]);
+          res.json({ Success: `${log}` });
+        }, 500);
       });
   });
 });
