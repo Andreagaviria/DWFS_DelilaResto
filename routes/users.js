@@ -16,7 +16,8 @@ const validarCamposNoVaciosUsuario = (req, res, next) => {
     !req.body.email ||
     !req.body.address ||
     !req.body.phone ||
-    !req.body.password
+    !req.body.password ||
+    !req.body.rol
   ) {
     let log = "";
     if (!req.body.firstName) log += "el first name es obligatorio, ";
@@ -26,6 +27,7 @@ const validarCamposNoVaciosUsuario = (req, res, next) => {
     if (!req.body.address) log += "el address es obligatorio, ";
     if (!req.body.phone) log += "el phone number es obligatorio, ";
     if (!req.body.password) log += "el password es obligatorio, ";
+    if (!req.body.rol) log += "el rol es obligatorio, ";
     return res.status(404).json({ Error: log });
   } else {
     next();
@@ -65,7 +67,7 @@ router.post("/register", validarCamposNoVaciosUsuario, (req, res) => {
 
     req.body.password = bcrypt.hashSync(req.body.password, 5);
 
-    query = `INSERT INTO users (firstName, lastName, user, email, address, phone, password) VALUES (?,?,?,?,?,?,?)`;
+    query = `INSERT INTO users (firstName, lastName, user, email, address, phone, password,rol) VALUES (?,?,?,?,?,?,?,?)`;
     const resultados = await database
       .query(query, {
         replacements: [
@@ -76,6 +78,7 @@ router.post("/register", validarCamposNoVaciosUsuario, (req, res) => {
           req.body.address,
           req.body.phone,
           req.body.password,
+          req.body.rol,
         ],
       })
       .then((resultados) => {
@@ -133,5 +136,5 @@ const crearToken = (usuario) => {
     expiredAt: moment().add(60, "minutes").unix(),
   };
 
-  return jwt.encode(payload, "frase secreta");
+  return jwt.encode(payload, "andreagaviria");
 };

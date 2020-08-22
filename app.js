@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const validarTokenMiddleware = require("./middlewares/validarToken");
 
 const app = express();
 
@@ -10,9 +11,9 @@ const productsRouter = require("./routes/products");
 const usersRouter = require("./routes/users");
 const ordersRouter = require("./routes/orders");
 
-app.use("/orders", ordersRouter);
+app.use("/orders", validarTokenMiddleware.validarToken, ordersRouter);
 app.use("/users", usersRouter);
-app.use("/products", productsRouter);
+app.use("/products", validarTokenMiddleware.validarToken, productsRouter);
 const database = require("./db");
 
 app.listen(3000, () => {

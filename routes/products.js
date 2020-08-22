@@ -1,5 +1,6 @@
 const sequelize = require("sequelize");
 const router = require("express").Router();
+const validarRolMiddleware = require(".././middlewares/validarRol");
 module.exports = router;
 
 const database = require("../db");
@@ -44,7 +45,7 @@ router.get("/:id", (req, res) => {
   }
 });
 
-router.post("/", validarCamposNoVaciosProducto, (req, res) => {
+router.post("/", validarCamposNoVaciosProducto, validarRolMiddleware.validarRol, (req, res) => {
   database.authenticate().then(async () => {
     const query = `INSERT INTO products (name, price, photo) VALUES (?,?,?)`;
     const resultados = await database.query(query, { replacements: [req.body.name, req.body.price, req.body.photo] }).then((resultados) => {
@@ -53,7 +54,7 @@ router.post("/", validarCamposNoVaciosProducto, (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validarRolMiddleware.validarRol, (req, res) => {
   let log = "";
   database.authenticate().then(async () => {
     const query = `SELECT * FROM products WHERE product_id=${req.params.id}`;
@@ -92,7 +93,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validarRolMiddleware.validarRol, (req, res) => {
   try {
     database.authenticate().then(async () => {
       const query = `SELECT * FROM products WHERE product_id=${req.params.id}`;

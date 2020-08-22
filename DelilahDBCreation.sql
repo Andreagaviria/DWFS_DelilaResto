@@ -19,7 +19,8 @@ CREATE TABLE users
     email VARCHAR(60) NOT NULL,
     address VARCHAR(100) NOT NULL,
     phone VARCHAR(60) NOT NULL,
-    password VARCHAR(150) NOT NULL
+    password VARCHAR(150) NOT NULL,
+	rol INT NOT NULL
 );
 
 
@@ -73,9 +74,9 @@ INSERT INTO status (name) VALUES ('Confirmado');
 INSERT INTO status (name) VALUES ('En preparación');
 INSERT INTO status (name) VALUES ('En camino');
 INSERT INTO status (name) VALUES ('Entregado');
-INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos', 'López', 'carloslopez', 'carlos.lopez@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
-INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos1', 'López1', 'carloslopez1', 'carlos.lopez1@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
-INSERT INTO users (firstname, lastname, user, email, address, phone, password) VALUES ('Carlos2', 'López2', 'carloslopez2', 'carlos.lopez2@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.');
+INSERT INTO users (firstname, lastname, user, email, address, phone, password,rol) VALUES ('Carlos', 'López', 'carloslopez', 'carlos.lopez@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.',1);
+INSERT INTO users (firstname, lastname, user, email, address, phone, password,rol) VALUES ('Carlos1', 'López1', 'carloslopez1', 'carlos.lopez1@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.',2);
+INSERT INTO users (firstname, lastname, user, email, address, phone, password,rol) VALUES ('Carlos2', 'López2', 'carloslopez2', 'carlos.lopez2@delilah.com', 'Calle 28 sur #43ª - 70', '310 123 1212', 'carlos1.',1);
 INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (1, 2, 3, 56000);
 INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (1, 3, 2, 40000);
 INSERT INTO orders (user_id, status_id, payment_id, total) VALUES (3, 1, 1, 7000);
