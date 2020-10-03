@@ -45,6 +45,51 @@ const validarCamposNoVaciosLogueo = (req, res, next) => {
   }
 };
 
+//Routes
+/**
+ * @swagger
+ * /users/register:
+ *  post:
+ *     description: se usa para registrar un nuevo usuario
+ *     parameters:
+ *        - in: body
+ *          name: User
+ *          required: false
+ *          schema:
+ *            $ref: "#/definitions/User"
+ *     responses:
+ *         '200':
+ *            description: Success
+ *            schema:
+ *                type: string
+ *definitions:
+ *  User:
+ *    properties:
+ *        firstName:
+ *            type: string
+ *            required: true
+ *        lastName:
+ *            type: string
+ *            required: true
+ *        user:
+ *            type: string
+ *            required: true
+ *        email:
+ *            type: string
+ *            required: true
+ *        address:
+ *            type: string
+ *            required: true
+ *        phone:
+ *            type: string
+ *            required: true
+ *        password:
+ *            type: string
+ *            required: true
+ *        rol:
+ *            type: integer
+ *            required: true
+ */
 router.post("/register", validarCamposNoVaciosUsuario, (req, res) => {
   //res.send("ok");
 
@@ -87,6 +132,32 @@ router.post("/register", validarCamposNoVaciosUsuario, (req, res) => {
   });
 });
 
+//Routes
+/**
+ * @swagger
+ * /users/login:
+ *  post:
+ *     description: Se usa para generar el token para el usuario
+ *     parameters:
+ *        - in: body
+ *          name: User
+ *          schema:
+ *            $ref: "#/definitions/UserForLogin"
+ *     responses:
+ *         '200':
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Message"
+ *definitions:
+ *  UserForLogin:
+ *    properties:
+ *        user:
+ *            type: string
+ *        email:
+ *            type: string
+ *        password:
+ *            type: string
+ */
 router.post("/login", validarCamposNoVaciosLogueo, (req, res) => {
   //res.send("login");
   const VariableNoVacia = req.body.user ? "user" : "email";

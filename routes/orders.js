@@ -5,6 +5,75 @@ module.exports = router;
 
 const database = require("../db");
 
+//Routes
+/**
+ * @swagger
+ * /orders:
+ *  get:
+ *     description: Obtengo ordenes
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                type: array
+ *                items:
+ *                     $ref: "#/definitions/Order"
+ *definitions:
+ *  Order:
+ *    properties:
+ *        order_id:
+ *            type: integer
+ *        payment_id:
+ *            type: integer
+ *        status_id:
+ *            type: integer
+ *        user_id:
+ *            type: integer
+ *        total:
+ *            type: integer
+ *        statusName:
+ *             type: string
+ *        paymentName:
+ *            type: string
+ *        firstName:
+ *            type: string
+ *        lastName:
+ *            type: string
+ *        address:
+ *            type: string
+ *        phone:
+ *            type: string
+ *        email:
+ *            type: string
+ *        user:
+ *            type: string
+ *        productList:
+ *            schema: array
+ *            items:
+ *               type: object
+ *               properties:
+ *                    product_id:
+ *                          type: integer
+ *                    details:
+ *                          schema: array
+ *                          items:
+ *                            type: object
+ *                            properties:
+ *                                 product_id:
+ *                                      type: integer
+ *                                 name:
+ *                                      type: string
+ *                                 price:
+ *                                      type: integer
+ *                                 photo:
+ *                                      type: string
+ */
 router.get("/", validarRolMiddleware.validarRol, (req, res) => {
   try {
     database.authenticate().then(async () => {
@@ -41,6 +110,43 @@ router.get("/", validarRolMiddleware.validarRol, (req, res) => {
   }
 });
 
+//Routes
+/**
+ * @swagger
+ * /orders/{order_id}/status:
+ *  put:
+ *     description: para actualizar el estado de un pedido
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: order_id
+ *          required: true
+ *          description: id de la orden
+ *        - in: body
+ *          name: statusId
+ *          schema:
+ *             $ref: "#/definitions/StatusParaActualizar"
+ *          required: true
+ *          description: id numerico del status
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Message"
+ *definitions:
+ *  StatusParaActualizar:
+ *    properties:
+ *        status_id:
+ *            type: integer
+ *  Message:
+ *    properties:
+ *        success:
+ *            type: string
+ */
 router.put("/:id/status", validarRolMiddleware.validarRol, (req, res) => {
   let log = "";
   database.authenticate().then(async () => {
@@ -73,6 +179,39 @@ router.put("/:id/status", validarRolMiddleware.validarRol, (req, res) => {
   });
 });
 
+//Routes
+/**
+ * @swagger
+ * /orders/{order_id}/pago:
+ *  put:
+ *     description: para actualizar el tipo de pago
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: order_id
+ *          required: true
+ *          description: id de la orden
+ *        - in: body
+ *          name: pago_id
+ *          schema:
+ *             $ref: "#/definitions/PagoParaActualizar"
+ *          required: true
+ *          description: id numerico del pago
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Message"
+ *definitions:
+ *  PagoParaActualizar:
+ *    properties:
+ *        pago_id:
+ *            type: integer
+ */
 router.put("/:id/pago", (req, res) => {
   let log = "";
   database.authenticate().then(async () => {
@@ -105,6 +244,28 @@ router.put("/:id/pago", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /orders/{order_id}:
+ *  delete:
+ *     description: Se usa para eliminar un pedido por su Id
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: order_id
+ *          required: true
+ *          description: Numeric id of the order
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                type: string
+ */
+
 router.delete("/:id", validarRolMiddleware.validarRol, (req, res) => {
   try {
     database.authenticate().then(async () => {
@@ -129,6 +290,42 @@ router.delete("/:id", validarRolMiddleware.validarRol, (req, res) => {
   }
 });
 
+//Routes
+/**
+ * @swagger
+ * /orders:
+ *  post:
+ *     description: Se usa para crear una orden
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: body
+ *          name: Order
+ *          required: true
+ *          schema:
+ *            $ref: "#/definitions/OrderForCreation"
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Message"
+ *definitions:
+ *  OrderForCreation:
+ *    properties:
+ *        payment_id:
+ *            type: integer
+ *        status_id:
+ *            type: integer
+ *        user_id:
+ *            type: integer
+ *        productos:
+ *              schema: array
+ *              items:
+ *                  type: integer
+ */
 router.post("/", (req, res) => {
   database.authenticate().then(async () => {
     let log = "";

@@ -4,6 +4,26 @@ const validarTokenMiddleware = require("./middlewares/validarToken");
 
 const app = express();
 
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: "Delilah Resto Andrea Gaviria",
+      description: "Delilah Resto API Proyecto Acamica-Globant",
+      contact: {
+        name: "Andrea Gaviria",
+      },
+      servers: ["http://localhost:3000"],
+    },
+  },
+  apis: ["./routes/*.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

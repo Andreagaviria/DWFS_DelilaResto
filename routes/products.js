@@ -13,6 +13,38 @@ const validarCamposNoVaciosProducto = (req, res, next) => {
   }
 };
 
+//Routes
+/**
+ * @swagger
+ * /products:
+ *  get:
+ *     description: Aqui obtenemos los productos
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                type: array
+ *                items:
+ *                     $ref: "#/definitions/Product"
+ *definitions:
+ *  Product:
+ *    properties:
+ *        product_id:
+ *            type: integer
+ *        name:
+ *            type: string
+ *        price:
+ *            type: integer
+ *        photo:
+ *            type: string
+ */
+
 router.get("/", (req, res) => {
   try {
     database.authenticate().then(async () => {
@@ -27,6 +59,28 @@ router.get("/", (req, res) => {
   }
 });
 
+//Routes
+/**
+ * @swagger
+ * /products/{productId}:
+ *  get:
+ *     description: Se usa para ver un producto por su Id
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: productId
+ *          required: true
+ *          description: Numeric id of the producto
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Product"
+ */
 router.get("/:id", (req, res) => {
   try {
     database.authenticate().then(async () => {
@@ -45,6 +99,38 @@ router.get("/:id", (req, res) => {
   }
 });
 
+//Routes
+/**
+ * @swagger
+ * /products:
+ *  post:
+ *     description: Se usa para crear un producto nuevo
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: body
+ *          name: Product
+ *          required: true
+ *          schema:
+ *            $ref: "#/definitions/ProductForCreation"
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                type: string
+ *definitions:
+ *  ProductForCreation:
+ *    properties:
+ *        name:
+ *            type: string
+ *        price:
+ *            type: integer
+ *        photo:
+ *            type: string
+ */
 router.post("/", validarCamposNoVaciosProducto, validarRolMiddleware.validarRol, (req, res) => {
   database.authenticate().then(async () => {
     const query = `INSERT INTO products (name, price, photo) VALUES (?,?,?)`;
@@ -54,6 +140,34 @@ router.post("/", validarCamposNoVaciosProducto, validarRolMiddleware.validarRol,
   });
 });
 
+//Routes
+/**
+ * @swagger
+ * /products/{product_id}:
+ *  put:
+ *     description: Se usa para actualizar un producto con id
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: product_id
+ *          required: false
+ *          description: Numeric id of the product
+ *        - in: body
+ *          name: product
+ *          schema:
+ *             $ref: "#/definitions/ProductForCreation"
+ *          required: false
+ *          description: producto
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/Message"
+ */
 router.put("/:id", validarRolMiddleware.validarRol, (req, res) => {
   let log = "";
   database.authenticate().then(async () => {
@@ -86,13 +200,35 @@ router.put("/:id", validarRolMiddleware.validarRol, (req, res) => {
     }
 
     if (log) {
-      res.json({ Error: `${log}` });
+      res.json({ Success: `${log}` });
     } else {
-      res.json({ Error: "No se actualizo ningun campo" });
+      res.json({ Success: "No se actualizo ningun campo" });
     }
   });
 });
 
+//Routes
+/**
+ * @swagger
+ * /products/{product_id}:
+ *  delete:
+ *     description: Se usa para eliminar un producto por su Id
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: product_id
+ *          required: true
+ *          description: Numeric id of the producto
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                type: string
+ */
 router.delete("/:id", validarRolMiddleware.validarRol, (req, res) => {
   try {
     database.authenticate().then(async () => {
