@@ -2,234 +2,223 @@
 
 Para correr el proyecto se deben seguir los siguientes pasos:
 
-0.  Si descargaste el proyecto de github, debes agregar tu proyecto al workspace de visual studio, abrir la terminal, ubicarte en la raiz del proyecto y ejecutar el comando npm install. Si lo descargaste de un adjunto debes descomprimirlo y agregarlo al workspace de visual studio.
+0.  Descargar el proyecto de github, abrir la carpeta del proyecto en visual studio code, abrir la terminal de git, ubicarse en la raiz del proyecto y ejecutar el comando npm install.
 
-1.  Abrir un nuevo query en mysql y ejecutar:
+1.  Abrir MYSQL o MAMP y ejecutar un nuevo query y pegar el script que se encuentra en DelilahDBCreation.sql
 
-        CREATE DATABASE IF NOT EXISTS delilah
+2.  Abrir el archivo db.js y cambiar el usuario agp por tu usuario y la contraseña andrea46. por tu contraseña.
 
-2.  Abrir el archivo db.js y cambiar la palabra root por el usuario de tu servidor de base de datos y la palabra new_password por tu password.
+3.  Luego de esto ir a la terminal y ubicarse en la carpeta "Proyecto Node Delila Restó"
 
-3.  Luego de esto ir a la terminal y ubicarse en la carpeta DelilahResto
+4.  Ejecutar el comando npm start en la consola.
 
-4.  Ejecutar el siguiente script node seed.js, al hacer esto se van a insertar datos de prueba para pedidos, usuarios, productos, pagos y stages. Si se quiere verificar esto se puede revisar las tablas en mysql.
+5.  En el navegador abrir la siguiente url: http://localhost:3000/api-docs.
 
-5.  Ejecutar el script npm start.
+Para testear los endpoints:
 
-6.  Abrir en el navegador la url http://localhost:3000/api-docs.
+# USERS
 
-A continuacion se dan indicaciones para probar los endpoints:
+## POST /users/register
 
-# USUARIOS
-
-## POST /usuarios/register
-
-1.  Si se quiere crear un nuevo usuario damos click en este endpoint
-2.  damos click en try it out
-3.  se nos abre un are de texto con el siguiente JSON
+1.  Para crear un usuario, hacer click en este endpoint
+2.  Click en "try it out"
+3.  se abre un campo con el siguiente JSON
 
               {
-              "username": "string",
               "firstName": "string",
               "lastName": "string",
+              "user": "string",
               "email": "string",
-              "phoneNumber": "string",
-              "deliveryAddress": "string",
+              "address": "string",
+              "phone": "string",
               "password": "string",
-              "rolId": "string"
+              "rol": 0
               }
 
-4.llenamos username con datos de prueba ejemplo
+4.  Reemplar los string por datos de prueba
+
+              {
+              "firstName": "andrea",
+              "lastName": "gaviria",
+              "user": "angapa",
+              "email": "andrea@hotmail.com",
+              "address": "carrera76",
+              "phone": "123 56 78",
+              "password": "andrea123",
+              "rol": 1
+              }
+
+5.  Click en "Execute". En caso de que haya sido exitoso, se muestra un string diciendo que el usuario ha sido registrado.
+
+## POST /users/login
+
+1.Hacer click en en este endpoint
+2.Click en "try it out"
+
+3.  Se mostrará el siguiente JSON:
 
                 {
-                "username": "josegomez",
-                "firstName": "jose",
-                "lastName": "gomez",
-                "email": "josegomez@gmail.com",
-                "phoneNumber": "5555",
-                "deliveryAddress": "cr 2 no 18-74",
-                "password": "1234",
-                "rolId": "1"
-                }
-
-5. Presionar Execute, si el registro fue exitoso se muestra el usuario creado, sino aparecera
-   un mensaje diciendo que el email o usuario ya existen
-
-## POST /usuarios/login
-
-1.Damos click en en este endpoint
-2.Damos click en try it out
-
-3.  Aparecera un JSON como el que se muestra a continuacion:
-
-                {
-                "username": "string",
+                "user": "string",
                 "email": "string",
                 "password": "string"
                 }
 
-4.  reemplazamos los campos con los datos del usuario creado
+4.  Reemplar los string por datos de prueba del anterior endpoint
 
                 {
-                "username": "josegomez",
-                "email": "josegomez@gmail.com",
-                "password": "1234"
+                "user": "angapa",
+                "email": "andrea@hotmail.com",
+                "password": "andrea123"
                 }
 
-5.  Si el logueo es exitoso obtendremos un token, este debera ser usado para todas las peticiones.
-    Hay que tener en cuenta que este token es solo valido por 50 minutos. si se supera este tiempo,
-    hay que generar otro.
+5.  Si el usuario es logueado de maner aexitosa obtenemos el Token que debe ser usado para las demás peticiones. El token sólo dura activo 1 hora; pasada la hora deberá enviarse de nuevo la petición para generar otro Token.
 
-# PEDIDOS
+# ORDERS
 
-## POST /pedidos
+## POST /orders
 
-1.  damos click a este endpoint
-2.  pegamos el token en el campo user-token
-3.  Nos aparecera un area de texto con un JSON como el siguiente:
+1.  Click a este endpoint
+2.  Click en "try it out"
+3.  Pegar el token en el campo "token"
+4.  Aparecerá el siguiente JSON:
 
             {
-                "pagoId": 0,
-                "stageId": 0,
-                "usuarioId": 0,
-                "chosenProductos": [
-                    "string"
-                    ]
+            "payment_id": 0,
+            "status_id": 0,
+            "user_id": 0,
+            "productos": [
+              0
+            ]
             }
 
-4.  podemos llenar los campos con los siguientes datos de prueba. en usuarioId no se debe poner nada
-    porque el pedido toma el id del usuario logueado, tener en cuenta que pagoId debe ser un valor entre
-    1 y 3 de otra forma se generara un error que dice que ese id no existe, el stageId debe estar entre 1
-    y 5, de lo contrario genera error. En el momento solo hay creados tres productos si se pone un Id con otros ids simplemente estos no se agregan.
+5.  Llenar los campos con los datos de prueba.
+
+            {
+            "payment_id": 1,
+            "status_id": 2,
+            "user_id": 4,
+            "productos": [
+              1,2,3
+            ]
+            }
+
+6.  Si la petición es creada con exito, aparecerá un texto como el siguiente:
+
+            {
+            "Success": "Se creo orden con id 7,el producto con id 1 se agrego al pedido,el producto con id 3 se agrego al pedido,el producto con id 2 se agrego al pedido,"
+            }
+
+## PUT /orders/{order_id}/status
+
+1.  VClick en este endpoint
+2.  Click en "try it out"
+3.  Pegamos el token activo
+4.  ponemos un Id de la orden en el campo order_id
+5.  Se mostrará el siguiente JSON:
 
                 {
-                    "pagoId": 1,
-                    "stageId": 2,
-                    "usuarioId": 0,
-                    "chosenProductos": [
-                        "1","2","3"
-                        ]
+                "status_id": 0
                 }
 
-5.  Al final si el producto se crea se obtendra un log como el que se muestra a continuacion.
+6.  Reemplazamos el valor del status_id:
 
                 {
-                    "Result": "producto con id 1 insertado: producto con id 2 insertado: producto con id 3 insertado: "
+                "status_id": 3
                 }
 
-## POST /pedidos/{pedidoId}/stage
+7.  si el request es exitoso, se actualizará el status de la orden
 
-1.  Vamos a este endpoint
-2.  Click en try it out
-3.  pegamos el token
-4.  ponemos el Id del pedido, en nuestro ejemplo el id 4
-5.  Aparecera un JSON como el siguiente:
+8.  Si cambiamos el rol del usuario por el 2 (1 para admin y 2 para usuario), no podremos realizar la consilta por que el usuario no está autorizado.
 
-                {
-                    "stageId": 0
-                }
+## POST /products
 
-6.  Reemplazamos el valor por un StageId distinto entre 1 y 5, sino aparecera error.
+1.  Cambiamos de nuevo el rol al 1, para poder realizar la siguiente petición.
+2.  Click en este endpoint.
+3.  Click en "try it out"
+4.  Pegamos el token
+5.  Aparecerá el siguiente JSON:
 
                 {
-                    "stageId": 2
-                }
-
-7.  si la respuesta es exitosa nos mostrara el pedido
-
-8.  si vamos a la base de datos y modificamos el rolId del usuario por 2 e intentamos
-    otra vez este endpoint, veremos que no estamos autorizados
-
-## POST /productos
-
-1.  Luego del paso 8 de la seccion anterior devolvemos el usuario a rolId 1.
-2.  damos click en este endpoint.
-3.  Click en try it out
-4.  pegamos el user-token
-5.  En el area de texto nos aparecera un JSON como el siguiente:
-
-                {
-                    "name": "string",
-                    "price": 0,
-                    "urlImage": "string"
+                "name": "string",
+                "price": 0,
+                "photo": "string"
                 }
 
 6.  Modificamos los campos con datos de ejemplo
 
                 {
-                    "name": "Asado Argetino",
-                    "price": 45000,
-                    "urlImage": "www.asado.com"
+                    "name": "hamburguesa",
+                    "price": 16000,
+                    "photo": "www.mihamburguesa.com"
                 }
 
-7.  Click en execute
-8.  Si el producto se crea exitoso aparece el pedido en la respuesta
-9.  Si cambiamos el rolId de nuestro usuario en la base de datos por 2 e intentamos hacer esto
-    otra vez nos respondera Usuario no autorizado
+7.  Click en "execute"
+8.  Si la petición es exitosa, se crea el producto
+9.  Si cambiamos de nuevo el rol en la base de datos por el 2, el usuario ya no podrá realizar esta petición.
 
-# PUT /productos/{productoId}
+# PUT /products/{product_id}
 
-1.  Damos click a este endpoint
-2.  Click en try it out
-3.  Pegamos el user-token
-4.  Ponemos el productId ejemplo 1
-5.  En el area de texto nos aparecera un JSON como el siguiente:
+1.  Click a este endpoint
+2.  Click en "try it out"
+3.  Pegamos el token
+4.  Ponemos el product_id
+5.  Aparecerá el siguiente JSON:
 
                 {
                     "name": "string",
                     "price": 0,
-                    "urlImage": "string"
+                    "photo": "string"
                 }
 
 6.  Modificamos lo que queramos pero solo enviamos los campos que querramos actualizar, ejemplo
 
                 {
-                    "name": "filete",
-                    "price": 45000
+                    "name": "hamburguesa doble",
+                    "price": 22000
+                    "photo": "string"
                 }
 
-7.  click en execute
-8.  si es exitoso nos responde un mensaje como el siguiente:
+7.  click en "execute"
+8.  si la petición es exitosa, saldrá un mensaje como el siguiente:
 
                 {
-                    "success": "se ha modificado"
+                "Success": "se actualizo el nombre hamburguesa doble del producto con id 4,se actualizo el precio 22000 del producto con id 4,se actualizo la foto string del producto con id 4,"
                 }
 
-9.  Si cambiamos el rolId de nuestro usuario en la base de datos por 2 e intentamos hacer esto
-    otra vez nos respondera Usuario no autorizado
+9.  Si cambiamos de nuevo el rol en la base de datos por el 2, el usuario ya no podrá realizar esta petición.
 
-# DELETE /productos/{productoId}
+# DELETE /products/{product_id}
+
+1.  Click a este endpoint
+2.  Click en "try it out"
+3.  Pegamos el token
+4.  Ponemos el product_id que se desa eliminar. Ejemplo: 1
+5.  Si la petición es exitosa, saldrá el siguiente mensaje:
+
+                "El producto con id 1 fue eliminado"
+
+6.  Si cambiamos de nuevo el rol en la base de datos por el 2, el usuario ya no podrá realizar esta petición.
+
+# GET /orders
+
+1.  Click a este endpoint
+2.  Click en "try it out"
+3.  Pegamos el token activo
+4.  El servidor nos respondera con lista de ordenes
+
+# DELETE /orders/{order_id}
 
 1.  Damos click a este endpoint
-2.  Click en try it out
-3.  Pegamos el user-token
-4.  Ponemos el productId ejemplo 1
-5.  Si la eliminacion es exitosa el servidor nos respondera
+2.  Click en "try it out"
+3.  Pegamos el token activo
+4.  Ponemos el order_id
+5.  Cambiar el rol a 1 para que podamos eliminar la orden.
+6.  Si el request es exitoso, nos saldrá el siguiente mensaje:
+
+                "El pedido con id 3 fue eliminado"
+
+7.  Si el rol se encuentra con el número 2, quiere decir que es un usuario el cual no puede realizar la petición. Para el cual saldrá el siguiente mensaje:
 
                 {
-                    "success": "se ha borrado el producto"
+                "Error": "usuario con rol no valido para esta consulta"
                 }
-
-6.  Si cambiamos el rolId de nuestro usuario en la base de datos por 2 e intentamos hacer esto
-    otra vez nos respondera Usuario no autorizado
-
-# GET /pedidos
-
-1.  Damos click a este endpoint
-2.  Click en try it out
-3.  Pegamos el user-token
-4.  El servidor nos respondera con una lista de pedidos
-5.  Observamos que el pedido 1 fue creado por el usuarioId 1 pero nosotros somos el usuarioId 4
-6.  Cambiamos nuestro rolId en la base de datos por 2
-
-# GET /pedidos/{pedidoId}
-
-1.  Damos click a este endpoint
-2.  Click en try it out
-3.  Pegamos el user-token
-4.  Ponemos el PedidoId 1
-5.  Dado que este pedido fue creado por el usuario 1 y nosotros no tenemos rolId 1 sino 2 (del paso 6 de la seccion anterior) nos tiene que aparecer el mensaje
-
-        {
-            "error": "Usted solo puede acceder a su informacion"
-        }
