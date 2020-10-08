@@ -3,10 +3,12 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jwt-simple");
 const moment = require("moment");
-
+const validarTokenMiddleware = require(".././middlewares/validarToken");
 module.exports = router;
+const rolAdmin = 1;
 
 const database = require("../db");
+const { or } = require("sequelize");
 
 const validarCamposNoVaciosUsuario = (req, res, next) => {
   if (
@@ -44,6 +46,94 @@ const validarCamposNoVaciosLogueo = (req, res, next) => {
     next();
   }
 };
+
+const VerificarUsuarioEsAdminOPropio = async (req, res, next) => {
+  const query = `SELECT * FROM users WHERE user_id = ${req.user_id}`;
+  database.query(query, { type: database.QueryTypes.SELECT }).then(async (usuario) => {
+    if (usuario[0].rol === rolAdmin || req.user_id == req.params.id) {
+      next();
+    } else {
+      return res.json({
+        error: "Usted solo puede acceder a su informacion",
+      });
+    }
+  });
+};
+
+//Routes
+/**
+ * @swagger
+ * /users/{user_id}/orders:
+ *  get:
+ *     description: para obtener los pedidos asociados al usuarios con  id user_id
+ *     parameters:
+ *        - in: header
+ *          name: token
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: path
+ *          name: user_id
+ *          required: true
+ *          description: id de la orden
+ *     responses:
+ *         "200":
+ *            description: Success
+ *            schema:
+ *                $ref: "#/definitions/UsuarioConOrden"
+ *definitions:
+ *  UsuarioConOrden:
+ *    properties:
+ *        user_id:
+ *            type: integer
+ *        firstName:
+ *            type: string
+ *        lastName:
+ *            type: string
+ *        user:
+ *            type: string
+ *        email:
+ *            type: string
+ *        address:
+ *            type: string
+ *        phone:
+ *            type: string
+ *        password:
+ *            type: string
+ *        rol:
+ *            type: integer
+ *        listOfOrders:
+ *            schema: array
+ *            items:
+ *               type: object
+ *               properties:
+ *                    order_id:
+ *                          type: integer
+ *                    payment_id:
+ *                          type: integer
+ *                    status_id:
+ *                          type: string
+ *                    user_id:
+ *                          type: integer
+ *                    total:
+ *                          type: string
+ */
+router.get("/:id/orders", validarTokenMiddleware.validarToken, VerificarUsuarioEsAdminOPropio, (req, res) => {
+  database.authenticate().then(async () => {
+    let query = `SELECT * FROM users WHERE user_id='${req.params.id}'`;
+    database.query(query, { type: database.QueryTypes.SELECT }).then((usuario) => {
+      if (usuario.length === 0) {
+        return res.status(404).json({ message: "el user no existe" });
+      } else {
+        const query = `SELECT * FROM orders WHERE user_id = ${usuario[0].user_id}`;
+        database.query(query, { type: database.QueryTypes.SELECT }).then(async (orders) => {
+          usuario[0].listOfOrders = orders;
+          res.json(usuario[0]);
+        });
+      }
+    });
+  });
+});
 
 //Routes
 /**
@@ -168,9 +258,7 @@ router.post("/login", validarCamposNoVaciosLogueo, (req, res) => {
         if (resultados.length === 0) {
           return res.status(404).json({ message: "El user no existe" });
         } else {
-          console.log(resultados[0].password);
           const PasswordCoinciden = bcrypt.compareSync(req.body.password, resultados[0].password);
-          console.log(PasswordCoinciden);
           if (PasswordCoinciden) {
             res.json({ success: crearToken(resultados[0]) });
           } else {
@@ -186,7 +274,6 @@ router.post("/login", validarCamposNoVaciosLogueo, (req, res) => {
         if (resultados.length === 0) {
           return res.status(404).json({ message: "El email no existe" });
         } else {
-          console.log(resultados[0].password);
           const PasswordCoinciden = bcrypt.compareSync(req.body.password, resultados[0].password);
 
           if (PasswordCoinciden) {

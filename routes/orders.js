@@ -94,7 +94,6 @@ router.get("/", validarRolMiddleware.validarRol, (req, res) => {
             productos.forEach((product, index) => {
               const query = `SELECT * FROM products WHERE product_id = ${product.product_id}`;
               database.query(query, { type: database.QueryTypes.SELECT }).then(async (productDetail) => {
-                console.log(productDetail);
                 product.details = await productDetail;
               });
             });
@@ -152,7 +151,6 @@ router.put("/:id/status", validarRolMiddleware.validarRol, (req, res) => {
   database.authenticate().then(async () => {
     const query = `SELECT * FROM orders WHERE order_id=${req.params.id}`;
     database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      console.log(resultados);
       if (resultados.length === 0) {
         return res.status(404).json({ message: "El pedido no existe" });
       }
@@ -217,7 +215,6 @@ router.put("/:id/pago", (req, res) => {
   database.authenticate().then(async () => {
     const query = `SELECT * FROM orders WHERE order_id=${req.params.id}`;
     database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-      console.log(resultados);
       if (resultados.length === 0) {
         return res.status(404).json({ message: "El pedido no existe" });
       }
@@ -271,7 +268,6 @@ router.delete("/:id", validarRolMiddleware.validarRol, (req, res) => {
     database.authenticate().then(async () => {
       const query = `SELECT * FROM orders WHERE order_id=${req.params.id}`;
       database.query(query, { type: database.QueryTypes.SELECT }).then((resultados) => {
-        //console.log(resultados);
         if (resultados.length === 0) {
           res.status(404).json({ message: "El pedido no existe" });
         } else {
@@ -388,7 +384,6 @@ router.post("/", (req, res) => {
 
         //////////////////////////////////////////////////////////////////////////
         setTimeout(() => {
-          console.log(resultados[0]);
           res.json({ Success: `${log}` });
         }, 500);
       });
